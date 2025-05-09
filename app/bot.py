@@ -1,8 +1,10 @@
 import os
+import json
 import cv2
 import numpy as np
 import subprocess
 import yt_dlp
+import requests
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -11,6 +13,15 @@ from concurrent.futures import ThreadPoolExecutor
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
+from dotenv import load_dotenv
+
+# Memuat variabel lingkungan dari file .env
+load_dotenv()
+
+# Mengambil kredensial JSON dari environment variable
+GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON")
+if not GOOGLE_CREDENTIALS_JSON:
+    raise ValueError("GOOGLE_CREDENTIALS_JSON tidak ditemukan di file .env")
 
 app = Flask(__name__)
 CORS(app)
@@ -112,7 +123,8 @@ def merge_audio(original, processed, output):
 
 def upload_to_gdrive(file_path, creds_json, folder_id=None):
     SCOPES = ['https://www.googleapis.com/auth/drive']
-    creds = service_account.Credentials.from_service_account_file(creds_json, scopes=SCOPES)
+    creds_dict = json.loads(GOOGLE_CREDENTIALS_JSON)
+    creds = service_account.Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     service = build('drive', 'v3', credentials=creds)
 
     file_metadata = {'name': os.path.basename(file_path)}
