@@ -1,1 +1,13 @@
 2025-05-09 11:41:43.650 | INFO     | __main__:<module>:160 - Server berjalan di http://0.0.0.0:5000
+2025-05-09 12:54:33.703 | INFO     | __main__:<module>:172 - Server berjalan di http://0.0.0.0:5000
+2025-05-09 13:46:32.082 | INFO     | __main__:<module>:184 - Server berjalan di http://0.0.0.0:5000
+2025-05-09 18:13:13.448 | INFO     | __main__:<module>:172 - Server berjalan di http://0.0.0.0:5000
+2025-05-09 19:01:02.028 | ERROR    | main:process:175 - Process error: [0;31mERROR:[0m [youtube:truncated_id] VIDEO_ID: Incomplete YouTube ID VIDEO_ID. URL https://youtube.com/watch?v=VIDEO_ID looks truncated.
+2025-05-09 19:06:31.448 | INFO     | main:process:174 - Processing video with URL: https://youtube.com/watch?v=dQw4w9WgXcQ
+2025-05-09 19:06:31.449 | INFO     | main:download_video:55 - Downloading video from URL: https://youtube.com/watch?v=dQw4w9WgXcQ
+2025-05-09 19:06:35.799 | INFO     | main:download_video:61 - Video downloaded: downloads/Rick Astley - Never Gonna Give You Up (Official Music Video).mp4
+2025-05-09 19:06:35.799 | INFO     | main:extract_frames:68 - Extracting frames from video: downloads/Rick Astley - Never Gonna Give You Up (Official Music Video).mp4
+2025-05-09 19:07:10.501 | INFO     | main:extract_frames:83 - Extracted 5300 frames.
+2025-05-09 19:07:11.440 | INFO     | main:detect_watermark_mask:87 - Detecting watermark mask from frames.
+2025-05-09 19:07:11.622 | INFO     | main:detect_watermark_mask:99 - Watermark mask detection complete.
+2025-05-09 19:07:11.622 | INFO     | main:remove_watermark:110 - Removing watermark from video: downloads/Rick Astley - Never Gonna Give You Up (Official Music Video).mp4

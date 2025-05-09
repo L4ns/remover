@@ -1,0 +1,1 @@
+2025-05-09 17:43:49.865 | ERROR    | __main__:upload_to_drive:57 - Failed to upload to Google Drive: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.

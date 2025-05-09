@@ -1,0 +1,2 @@
+2025-05-09 17:54:48.206 | ERROR    | __main__:upload_to_drive:57 - Failed to upload to Google Drive: name 'SERVICE_ACCOUNT_FILE' is not defined
+2025-05-09 17:56:00.809 | ERROR    | __main__:upload_to_drive:57 - Failed to upload to Google Drive: name 'SERVICE_ACCOUNT_FILE' is not defined

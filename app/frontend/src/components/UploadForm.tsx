@@ -1,5 +1,4 @@
-// ... existing code ...
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProgressBar from "./ProgressBar";
 
 export default function UploadForm() {
@@ -17,38 +16,81 @@ export default function UploadForm() {
     setError("");
     setLoading(true);
 
-    try {
-      let res, data;
-      if (file) {
-        // Upload file ke endpoint /upload
-        const formData = new FormData();
-        formData.append("file", file);
-        res = await fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData,
-        });
-      } else if (link) {
-        // Proses link ke endpoint /process
-        res = await fetch("http://localhost:5000/process", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: link }),
-        });
-      } else {
-        setError("Masukkan link atau pilih file.");
-        setLoading(false);
-        return;
-      }
-      data = await res.json();
-      if (data.result_url) {
-        setResultUrl(data.result_url);
-      } else {
-        setError(data.error || "Gagal memproses video");
-      }
-    } catch {
-      setError("Gagal terhubung ke server");
+    if (file) {
+      await uploadWithProgress(file);
+    } else if (link) {
+      await processLink(link);
+    } else {
+      setError("Masukkan link atau pilih file.");
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const uploadWithProgress = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:5000/upload", true);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      setLoading(false);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (data.stream_url || data.result_url) {
+            setResultUrl(data.stream_url || data.result_url);
+          } else {
+            setError(data.error || "Gagal memproses video");
+          }
+        } catch {
+          setError("Respon server tidak valid.");
+        }
+      } else {
+        setError(`Gagal upload. Status: ${xhr.status}`);
+      }
+    };
+
+    xhr.onerror = () => {
+      setLoading(false);
+      setError("Terjadi kesalahan saat upload.");
+    };
+
+    xhr.send(formData);
+  };
+
+  const processLink = async (link: string) => {
+    try {
+      const res = await fetch("http://localhost:5000/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: link }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.stream_url || data.result_url) {
+          setResultUrl(data.stream_url || data.result_url);
+        } else {
+          setError(data.error || "Gagal memproses video.");
+        }
+      } else {
+        setError(data.error || "Proses gagal.");
+      }
+    } catch (err) {
+      setError("Gagal terhubung ke server.");
+    } finally {
+      setLoading(false);
+      setProgress(100);
+    }
   };
 
   return (
@@ -56,7 +98,10 @@ export default function UploadForm() {
       <input
         type="file"
         accept="video/*"
-        onChange={e => setFile(e.target.files?.[0] || null)}
+        onChange={(e) => {
+          setFile(e.target.files?.[0] || null);
+          setLink("");
+        }}
         className="border p-2 rounded"
       />
       <div className="text-center text-gray-500">atau</div>
@@ -64,12 +109,15 @@ export default function UploadForm() {
         type="text"
         placeholder="Paste link video (TikTok, IG, dst)"
         value={link}
-        onChange={e => setLink(e.target.value)}
+        onChange={(e) => {
+          setLink(e.target.value);
+          setFile(null);
+        }}
         className="border p-2 rounded"
       />
       <button
         type="submit"
-        className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition"
+        className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition disabled:opacity-50"
         disabled={loading}
       >
         {loading ? "Memproses..." : "Proses Video"}
@@ -78,7 +126,11 @@ export default function UploadForm() {
       {resultUrl && (
         <div className="mt-4">
           <video src={resultUrl} controls className="w-full rounded shadow" />
-          <a href={resultUrl} download className="block mt-2 text-indigo-600 underline">
+          <a
+            href={resultUrl}
+            download
+            className="block mt-2 text-indigo-600 underline"
+          >
             Download Hasil
           </a>
         </div>
@@ -87,4 +139,3 @@ export default function UploadForm() {
     </form>
   );
 }
-// ... existing code ...
